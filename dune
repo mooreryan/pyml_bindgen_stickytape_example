@@ -1,0 +1,40 @@
+(executable
+ (name yo)
+ (libraries pyml))
+
+(rule
+ (target interface_rollup.py)
+ (deps
+  (source_tree py))
+ (action
+  (run
+   stickytape
+   py/interface.py
+   --add-python-path
+   py
+   --output-file
+   interface_rollup.py)))
+
+(rule
+ (target utils.ml)
+ (mode
+  (promote (until-clean)))
+ (deps
+  (:specs specs.txt)
+  (:interface interface_rollup.py))
+ (action
+  (with-stdout-to
+   utils.ml
+   (pipe-stdout
+    (run
+     %{bin:pyml_bindgen}
+     %{specs}
+     interface
+     NA
+     --associated-with
+     module
+     --caml-module
+     Py_stuff
+     --embed-python-source
+     interface_rollup.py)
+    (run ocamlformat --name utils.ml -)))))

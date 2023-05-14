@@ -1,0 +1,2 @@
+val whoa : a:int -> b:int -> unit -> int
+val cool : unit -> string
